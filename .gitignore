@@ -1,0 +1,14 @@
+justo-V148jmd9
+logs
+*.log
+.env
+
+local.py
+
+*.pyc
+
+__pycache__
+
+*sqlite3
+.vscode
+*.json

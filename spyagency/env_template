@@ -1,0 +1,10 @@
+DJANGO_SETTINGS_MODULE = Indica el settings al cual va apuntar el servidor
+SECRET_KEY = Clave secreta del Proyecto
+DEBUG = Booleano que indica si el py estará en modo debug o en producción
+ALLOWED_HOSTS = Aquí se debe colocar solo el host del py
+
+DB_NAME = Nombre de la base de datos
+DB_USER = Usuario de la base de datos
+DB_PASSWORD = Contraseña de la base de datos
+DB_HOST = host de la base de datos
+DB_PORT = puerto de conexion con la base de datos
