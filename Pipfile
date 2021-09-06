@@ -22,6 +22,8 @@ psycopg2 = "==2.9.1"
 python-dateutil = "==2.8.2"
 python-dotenv = "==0.19.0"
 requests = "==2.26.0"
+names = "*"
+django-autocomplete-light = "*"
 
 [dev-packages]
 
