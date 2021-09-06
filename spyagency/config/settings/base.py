@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 from . import get_env_variable
 
-env_path = Path('.') / '.env'
+env_path = Path(".") / ".env"
 load_dotenv(dotenv_path=env_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,8 +33,9 @@ SECRET_KEY = get_env_variable("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_env_variable("DEBUG")
 
-ALLOWED_HOSTS = get_env_variable("ALLOWED_HOSTS")
+ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = "users.User"
 
 # Application definition
 
@@ -53,6 +54,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "simple_history",
     "url_filter",
+    "dal",
+    "dal_select2",
 ]
 
 MIDDLEWARE = [
@@ -65,6 +68,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    "utils.middleware.BLKSoftMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -141,7 +145,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = "static"
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles/"), )
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles/"),)
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = "media"
@@ -159,9 +163,7 @@ CORS_ALLOWED_ORIGINS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_jwt.authentication.JSONWebTokenAuthentication",),
     "DEFAULT_FILTER_BACKENDS": [
         "url_filter.integrations.drf.DjangoFilterBackend",
     ],
@@ -179,9 +181,14 @@ REST_FRAMEWORK = {
 
 
 AUTHENTICATION_BACKENDS = (
-    'utils.backends.EmailAuthBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    "utils.backends.EmailAuthBackend",
+    "django.contrib.auth.backends.ModelBackend",
 )
+
+LOGIN_URL = "/"
+LOGIN_REDIRECT_URL = "/hits/"
+LOGOUT_REDIRECT_URL = "/"
+
 
 SITE_NAME = "spy"
 CSRF_COOKIE_NAME = "csrftoken_" + SITE_NAME
@@ -194,9 +201,7 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {
-            "format": "%(levelname)-.3s %(asctime)s %(module)s %(name)s %(message)s \n\n"
-        },
+        "verbose": {"format": "%(levelname)-.3s %(asctime)s %(module)s %(name)s %(message)s \n\n"},
         "simple": {"format": "%(levelname)s %(message)s"},
     },
     "handlers": {

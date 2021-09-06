@@ -1,0 +1,112 @@
+{% load static %}
+{% load tags %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>SpyAgency</title>
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    {% block stylesheet %}
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <link href="{% static 'css/default/app.min.css' %}" rel="stylesheet" />
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <style>
+      .header .navbar-user img {
+        float: left;
+        width: 30px;
+        height: 30px;
+        margin: -5px 0px -5px 0;
+        -webkit-border-radius: 30px;
+        border-radius: 30px;
+      }
+
+      .hide {
+        display: none;
+      }
+    </style>
+    {% endblock stylesheet %} 
+	{% block extra_stylesheet %} {% endblock extra_stylesheet %}
+  </head>
+
+  <body>
+    <!-- begin #page-loader -->
+    <div id="page-loader" class="fade show"><span class="spinner"></span></div>
+    <!-- end #page-loader -->
+
+    <!-- begin #page-container -->
+    <div
+      id="page-container"
+      class="page-container fade page-sidebar-fixed page-header-fixed"
+    >
+      <!-- begin #header -->
+      <div id="header" class="header navbar-default">
+        {% block header %} {% include 'base/header.html' %} {% endblock header %}
+      </div>
+      <!-- end #header -->
+
+      <!-- begin #sidebar -->
+      <div id="sidebar" class="sidebar">
+        {% block sidebar %} {% include 'base/sidebar.html' %} {% endblock sidebar %}
+      </div>
+      <div class="sidebar-bg"></div>
+      <!-- end #sidebar -->
+
+      <!-- begin #content -->
+      <div id="content" class="content">
+        <!-- begin breadcrumb -->
+        <ol class="breadcrumb float-xl-right">
+          <li class="breadcrumb-item active dateDjango"></li>
+        </ol>
+        <!-- end breadcrumb -->
+        <!-- begin page-header -->
+        <h1 class="page-header" id="page-header"></h1>
+        <!-- end page-header -->
+        {% block container %}{% endblock container %}
+      </div>
+      <!-- end #content -->
+      <!-- begin theme-panel -->
+      <div class="theme-panel theme-panel-lg">
+        <a
+          href="javascript:;"
+          data-click="theme-panel-expand"
+          class="theme-collapse-btn"
+          ><i class="fa fa-cog"></i
+        ></a>
+        <div class="theme-panel-content" id="panel_right_content"></div>
+      </div>
+      <!-- end theme-panel -->
+
+      <!-- begin scroll to top btn -->
+      <a
+        href="javascript:;"
+        class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade"
+        data-click="scroll-top"
+        ><i class="fa fa-angle-up"></i
+      ></a>
+      <!-- end scroll to top btn -->
+    </div>
+    <!-- end page container -->
+    {% block javascript %}
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="{% static 'js/app.min.js' %}"></script>
+    <script src="{% static 'js/theme/default.min.js' %}"></script>
+    <script src="{% url 'javascript' %}"></script>
+    <script src="{% static 'scripts/common.js' %}"></script>
+    <script src="{% static 'scripts/django.js' %}"></script>
+    <script src="{% static 'scripts/panel_lateral_hitmen.js' %}"></script>
+    <script src="{% static 'scripts/panel_lateral_target.js' %}"></script>
+    <script src="{% static 'plugins/sweetalert/dist/sweetalert.min.js' %}"></script>
+    <!-- ================== END BASE JS ================== -->
+    {% endblock javascript %} {% block extra_javascript %}
+	{% endblock extra_javascript %}
+  </body>
+</html>

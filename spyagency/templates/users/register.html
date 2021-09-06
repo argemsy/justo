@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>SpyAgent</title>
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <link href="/static/css/default/app.min.css" rel="stylesheet" />
+    <!-- ================== END BASE CSS STYLE ================== -->
+  </head>
+
+  <body class="pace-top bg-white">
+    <!-- begin #page-loader -->
+    <div id="page-loader" class="fade show"><span class="spinner"></span></div>
+    <!-- end #page-loader -->
+
+    <!-- begin #page-container -->
+    <div id="page-container" class="fade">
+      <!-- begin register -->
+      <div class="register register-with-news-feed">
+        <!-- begin news-feed -->
+        <div class="news-feed">
+          <div
+            class="news-image"
+            style="background-image: url(/static/img/login-bg/login-bg-17.jpg)"
+          ></div>
+          <div class="news-caption">
+            <h4 class="caption-title"><b>Spy</b> Agency App</h4>
+          </div>
+        </div>
+        <!-- end news-feed -->
+        <!-- begin right-content -->
+        <div class="right-content">
+          <!-- begin register-header -->
+          <h1 class="register-header">
+            Registro de usuarios
+            <small
+              >Aquí puedes registrarte como usuario del sistema de
+              espionaje</small
+            >
+          </h1>
+          <!-- end register-header -->
+          <!-- begin register-content -->
+          <div class="register-content">
+            <label class="control-label"
+              >Email <span class="text-danger">*</span></label
+            >
+            <div class="row m-b-15">
+              <div class="col-md-12">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Email address"
+                  id="email"
+                  required
+                />
+              </div>
+            </div>
+
+            <label class="control-label"
+              >Password <span class="text-danger">*</span></label
+            >
+            <div class="row m-b-15">
+              <div class="col-md-12">
+                <input
+                  type="password"
+                  class="form-control"
+                  placeholder="Password"
+                  id="password"
+                  required
+                />
+              </div>
+            </div>
+            <div class="register-buttons">
+              <button
+                type="button"
+                onclick="return create_account();"
+                class="btn btn-primary btn-block btn-lg"
+              >
+                Registrarse
+              </button>
+            </div>
+            <div class="m-t-20 m-b-40 p-b-40 text-inverse">
+              ¿Ya está registrado? Haga click
+              <a href="{% url 'users:account:login' %}"> aquí</a> para ingresar.
+            </div>
+            <hr />
+            <p class="text-center">&copy; Spy Agency Right Reserved 2021</p>
+          </div>
+          <!-- end register-content -->
+        </div>
+        <!-- end right-content -->
+      </div>
+      <!-- end register -->
+    </div>
+    <!-- end page container -->
+
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="{% url 'javascript' %}"></script>
+    <script src="/static/js/app.min.js"></script>
+    <script src="/static/js/theme/default.min.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    <script src="/static/scripts/common.js"></script>
+    <script src="/static/plugins/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+      create_account = () => {
+        let $data = {
+          email: $("#email").val(),
+          password: $("#password").val(),
+        };
+        let errors = 0;
+        for (data in $data) {
+          if ($data[data] == null || $data[data] == "") {
+            errors += 1;
+          }
+        }
+        if (errors > 0) {
+          alert("ERRORES");
+        } else {
+          $.ajax({
+            url: "/users/api/v1/",
+            method: "POST",
+            type: "json",
+            data: $data,
+            success: function (response) {
+              swal("Éxito, se ha registrado existosamente!!!");
+              setTimeout(function () {
+                location.href = "/";
+              }, 5000);
+            },
+            error: function (error) {
+              email = error.responseJSON["email"];
+              password = error.responseJSON["password"];
+              if (email) {
+                swal("Error", email[0], "error");
+              }
+              if (password) {
+                swal("Error", password[0], "error");
+              }
+            },
+          });
+        }
+        return false;
+      };
+    </script>
+  </body>
+</html>

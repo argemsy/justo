@@ -1,0 +1,121 @@
+{% extends 'base/base.html' %}  {% load static %} {% block extra_stylesheet %}
+<link
+  href="{% static 'plugins/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}"
+  rel="stylesheet"
+/>
+<link
+  href="{% static 'plugins/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}"
+  rel="stylesheet"
+/>
+{% endblock extra_stylesheet %} {% block container %}
+
+<!-- begin row -->
+<div class="row">
+  <!-- begin col-12 -->
+  <div class="col-xl-12">
+    <!-- begin panel -->
+    <div class="panel panel-inverse">
+      <!-- begin panel-heading -->
+      <div class="panel-heading">
+        <h4 class="panel-title"></h4>
+        <div class="panel-heading-btn">
+          <a
+            href="{% url 'hits:views:list' %}"
+            class="btn btn-xs btn-icon btn-default"
+          >
+            <i class="fa fa-arrow-left"></i
+          ></a>
+          <a
+            href="javascript:;"
+            class="btn btn-xs btn-icon btn-default"
+            data-click="panel-reload"
+            ><i class="fa fa-redo"></i
+          ></a>
+          <a
+            href="javascript:;"
+            class="btn btn-xs btn-icon btn-warning"
+            data-click="panel-collapse"
+            ><i class="fa fa-minus"></i
+          ></a>
+        </div>
+      </div>
+      <!-- end panel-heading -->
+      <!-- begin alert -->
+      <!-- <div class="alert alert-secondary fade show">
+				<button type="button" class="close" data-dismiss="alert">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				In the modern world of responsive web design tables can often cause a particular problem for designers
+				due to their row based layout. Responsive is an extension for DataTables that resolves that problem by
+				optimising the table's layout for different screen sizes through the dynamic insertion and removal of
+				columns from the table.
+			</div> -->
+      <!-- end alert -->
+      <!-- begin panel-body -->
+      <div class="panel-body">
+        <table
+          id="hit_dt"
+          class="table table-striped table-bordered table-td-valign-middle"
+          style="width: 100%"
+        ></table>
+      </div>
+      <!-- end panel-body -->
+    </div>
+    <!-- end panel -->
+  </div>
+  <!-- end col-12 -->
+  <div></div>
+</div>
+<!-- end row -->
+{% endblock container %} {% block extra_javascript %}
+<script src="{% static 'plugins/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'js/demo/table-manage-responsive.demo.js' %}"></script>
+
+<script>
+  table_info_template = (key, value) => {
+    return `<tr>
+					<th>${key}</th><td>${value}</td>
+				</tr>`;
+  };
+
+  let id = getUrlLastParameter();
+  url = `/hits/api/v1/hits/${id}/`;
+
+  $.ajax({
+    url: url,
+    method: "GET",
+    type: "json",
+    headers: { Authorization: "jwt " + HDD.get(Django.name_jwt) },
+    success: function (response) {
+      html = `${response.title}<small class="subtitle"> ${response.subtitle}</small>`;
+      $("#page-header").empty().html(html);
+      html = `<tr>
+						<th>Asignación</th><td>${response.code_hit}</td>
+					</tr>
+					<tr>
+						<th>Asesino</th><td>${response.hitmen}</td>
+					</tr>
+					<tr>
+						<th>Descripción</th><td>${response.hit_detail}</td>
+					</tr>
+					<tr>
+						<th>Objetivo</th><td>${response.target}</td>
+					</tr>
+					<tr>
+						<th>Status del hit</th><td>${response.status}</td>
+					</tr>
+					<tr>
+						<th>Asignado por</th><td>${response.assigned_by}</td>
+					</tr>`;
+      $("#hit_dt").empty().append(html);
+    },
+    error: function (error) {
+      console.log(error);
+    },
+  });
+</script>
+
+{% endblock extra_javascript %}
