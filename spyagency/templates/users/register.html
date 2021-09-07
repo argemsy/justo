@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,7 +16,7 @@
       href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
       rel="stylesheet"
     />
-    <link href="/static/css/default/app.min.css" rel="stylesheet" />
+    <link href="{% static 'css/default/app.min.css' %}" rel="stylesheet" />
     <!-- ================== END BASE CSS STYLE ================== -->
   </head>
 
@@ -107,51 +108,12 @@
 
     <!-- ================== BEGIN BASE JS ================== -->
     <script src="{% url 'javascript' %}"></script>
-    <script src="/static/js/app.min.js"></script>
-    <script src="/static/js/theme/default.min.js"></script>
+    <script src="{% static 'js/app.min.js' %}"></script>
+    <script src="{% static 'js/theme/default.min.js' %}"></script>
     <!-- ================== END BASE JS ================== -->
-    <script src="/static/scripts/common.js"></script>
-    <script src="/static/plugins/sweetalert/dist/sweetalert.min.js"></script>
-    <script>
-      create_account = () => {
-        let $data = {
-          email: $("#email").val(),
-          password: $("#password").val(),
-        };
-        let errors = 0;
-        for (data in $data) {
-          if ($data[data] == null || $data[data] == "") {
-            errors += 1;
-          }
-        }
-        if (errors > 0) {
-          alert("ERRORES");
-        } else {
-          $.ajax({
-            url: "/users/api/v1/",
-            method: "POST",
-            type: "json",
-            data: $data,
-            success: function (response) {
-              swal("Éxito, se ha registrado existosamente!!!");
-              setTimeout(function () {
-                location.href = "/";
-              }, 5000);
-            },
-            error: function (error) {
-              email = error.responseJSON["email"];
-              password = error.responseJSON["password"];
-              if (email) {
-                swal("Error", email[0], "error");
-              }
-              if (password) {
-                swal("Error", password[0], "error");
-              }
-            },
-          });
-        }
-        return false;
-      };
-    </script>
+    <script src="{% static 'scripts/common.js' %}"></script>
+    <script src="{% static 'plugins/sweetalert/dist/sweetalert.min.js' %}"></script>
+    <script src="{% static 'scripts/register.js' %}"></script>
+
   </body>
 </html>

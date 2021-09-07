@@ -72,6 +72,7 @@ class UserCreateSerializer(sz.ModelSerializer):
 
     # def validate_password(self, password):
     #     pattern = r"^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$])[\w\d@#$]{6,12}$"
+    #     print(re.fullmatch(pattern, password))
     #     if not re.fullmatch(pattern, password):
     #         raise sz.ValidationError(
     #             _(

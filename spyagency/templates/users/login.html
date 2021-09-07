@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,7 @@
 	
 	<!-- ================== BEGIN BASE CSS STYLE ================== -->
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-	<link href="/static/css/default/app.min.css" rel="stylesheet" />
+	<link href="{% static 'css/default/app.min.css' %}" rel="stylesheet" />
 	<!-- ================== END BASE CSS STYLE ================== -->
 </head>
 <body class="pace-top">
@@ -65,16 +66,17 @@
 	<!-- end page container -->
 	
 	<!-- ================== BEGIN BASE JS ================== -->
-	<script src="/static/js/app.min.js"></script>
-	<script src="/static/js/theme/default.min.js"></script>
+	<script src="{% static 'js/app.min.js' %}"></script>
+	<script src="{% static 'js/theme/default.min.js' %}"></script>
 	<!-- ================== END BASE JS ================== -->
 	
 	<!-- ================== BEGIN PAGE LEVEL JS ================== -->
-	<script src="/static/js/demo/login-v2.demo.js"></script>
+	<script src="{% static 'js/demo/login-v2.demo.js' %}"></script>
 	<!-- ================== END PAGE LEVEL JS ================== -->
-	<script src="/static/plugins/js-cookie/js.cookie.js"></script>
+	<script src="{% static 'plugins/js-cookie/js.cookie.js' %}"></script>
 	<script src="{% url 'javascript' %}"></script>
-	<script src="/static/scripts/common.js"></script>
-	<script src="/static/scripts/login.js"></script>
+	<script src="{% static 'scripts/common.js' %}"></script>
+	<script src="{% static 'plugins/sweetalert/dist/sweetalert.min.js' %}"></script>
+	<script src="{% static 'scripts/login.js' %}"></script>
 </body>
 </html>

@@ -5,7 +5,9 @@ from utils.models import BaseModel
 
 class HitManager(models.Manager):
     def get_queryset(self):
-        return self.select_related("hitmen", "target", "assigned_by")
+        return super().get_queryset().select_related(
+            "hitmen", "target", "assigned_by"
+        )
 
 
 class Hit(BaseModel):

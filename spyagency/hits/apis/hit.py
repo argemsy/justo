@@ -1,11 +1,12 @@
+from django.contrib.auth.models import Group
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet
-
 from hits.models import Hit
 from hits.serializers import HitCreateSerializer, HitListSerializer
+from rest_framework.decorators import action
+from rest_framework.viewsets import ModelViewSet
+from users.models import User
 from utils.decorator import decorator_api_titles
 
 
@@ -21,12 +22,18 @@ from utils.decorator import decorator_api_titles
 class HitViewSet(ModelViewSet):
     serializer_class = HitCreateSerializer
 
+    def get_big_boss(self):
+        big_boss = User.objects.filter(groups__name__in=["big_boss"])
+        return big_boss
+
     def get_queryset(self):
         if self.request.user.groups.filter(name="big_boss").exists():
             queryset = Hit.objects.all()
         elif self.request.user.groups.filter(name="managers").exists():
             queryset = Hit.objects.filter(
-                Q(assigned_by=self.request.user) | Q(hitmen=self.request.user)
+                Q(assigned_by=self.request.user) |
+                Q(hitmen=self.request.user) |
+                Q(assigned_by__in=self.get_big_boss())
             )
         else:
             queryset = Hit.objects.filter(hitmen=self.request.user)
@@ -49,3 +56,17 @@ class HitViewSet(ModelViewSet):
         if self.action in ["list", "retrieve", "bulk"]:
             return HitListSerializer
         return super().get_serializer_class()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.action == "list":
+            context["fields_out"] = ['hit_detail', 'status_detail', 'assigned_at', 'modal']
+        elif self.action == "retrieve":
+            context["fields_out"] = ["id", "buttons", "status_detail", "level"]
+        elif self.action == 'update':
+            context["fields_out"] = ["first_name", "last_name"]
+        return context
+
+    def perform_update(self, serializer):
+        serializer.save(status=self.request.POST.get("status", self.get_object().status))
+        return super().perform_update(serializer)
