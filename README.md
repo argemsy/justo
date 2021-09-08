@@ -3,9 +3,9 @@
 ## <div id="indice">Índice</div>
 
 1. [Introducción](#intro)
+1. [Indicaciones](#indicaciones)
 1. [Dependencias](#dependencias)
 1. [RoadMap](#roadmap)
-
 1. [Modelado](#models)
    - [Modelos del app Users](#users_model)
    - [Modelos del app Hit's](#hits_model)
@@ -24,6 +24,40 @@ A modo de introducción el presente es un mini proyecto que a su vez sirve de te
 
 [Regresar al Indice](#indice)
 
+## <div id="indicaciones">Indicaciones</div>
+
+- Crear una carpeta para el manejo de los `logs`, esta debe estar un nivel por encima del root del proyecto.
+
+- Crear un archivo `.env`, este debe estar en el root del proyecto.
+
+```.env
+# spyagency/.env
+DJANGO_SETTINGS_MODULE='config.settings.local'
+SECRET_KEY="django-insecure-ha1qx^v^n%v%j7c2&*i@loby5jalsh9#&6)82i)kr(2(22%sr5"
+DEBUG=True
+ALLOWED_HOSTS=[]
+```
+
+- Crear un archivo `local.py`, este archivo debe estar en la ruta `spyagency/config/settings/`
+
+```python
+# spyagency/config/settings/local.py
+from .base import *
+
+ALLOWED_HOSTS = []
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+```
+- Correr el comando `python3 manage.py migrate`, con este comando se ejecuta la creación de usuarios como se solicita en el doc de requerimientos.
+
+
+[Regresar al Indice](#indice)
 ## <div id="dependencias">Dependencias</div>
 
 Acá dejo un listado de las principales dependencias del proyecto, de igual manera en el repositorio de código para esta prueba se encuentra el archivo Pipfile, la `python_version = "3.9"`
@@ -354,4 +388,29 @@ class Target(BaseModel):
         return f"{self.first_name}, {self.last_name}"
 
 ```
+[Regresar al Indice](#indice)
+
+### <div id="views">Vistas</div> ###
+
+#### Hit's ####
+- List, muestra el listado general de hit's.
+
+![Hits](imgs/hits_list.png)
+
+- Detail, muestra el detalle de un hit, en él, si usted es un big boss o un manager puede editar tanto el estado como el hitmen, a través del botón edit de la parte superior en el detalle.
+
+![Hits](imgs/hits_detail.png)
+
+- Create, acá puede crear un nuevo hit si usted es un big boss o un manager.
+
+![Hits](imgs/hits_create.png)
+
+#### Hitmen ####
+- List, acá puede observar un listado general de asesinos
+![Hits](imgs/hitmen_list.png)
+
+#### Bulk's ####
+- List, acá en esta vista se generan las re-asignaciones dentro de la plataforma.
+![Hits](imgs/bulk_list.png)
+
 [Regresar al Indice](#indice)
