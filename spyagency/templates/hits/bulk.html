@@ -103,6 +103,7 @@
       },
     },
     initComplete: function (settings, response) {
+
       html = `${response.title}<small class="subtitle"> ${response.subtitle}</small>`;
       $("#page-header").empty().html(html);
 
@@ -116,10 +117,10 @@
       { data: "code_hit" },
       { data: "hitmen" },
       { data: "target" },
-      { data: "status" },
-      { data: "level" },
+      { data: "status", "className": "text-center" },
+      { data: "level", "className": "text-center" },
       { data: "assigned_by" },
-      { data: "buttons" },
+      { data: "buttons_bulk", "className": "text-center" },
     ],
     responsive: true,
     destroy: true,

@@ -69,7 +69,6 @@
           class="table table-striped table-bordered table-td-valign-middle"
           style="width: 100%"
         ></table>
-        
       </div>
       <!-- end panel-body -->
     </div>
@@ -150,22 +149,32 @@
 
       // definimos la funcion que levanta al modal
       loadModal = () => {
-        let obj = {
-          id: id,
-          title: id,
-          content: response.modal,
-          rol: response.rol
-        };
+        if (response.status == "Finalizado" || response.status == "Fallido") {
+          swal({
+            icon: "info",
+            title: "Información",
+            text:
+              "Este hit se encuentra con status " +
+              response.status +
+              " y no puede ser editado.",
+            timer: 5000,
+            buttons: false,
+          });
+        } else {
+          let obj = {
+            id: id,
+            title: id,
+            content: response.modal,
+            rol: response.rol,
+          };
 
-        $("#modalGeneral")
-          .empty()
-          .append(modal_body_template(obj))
-          .modal({ show: true });
+          $("#modalGeneral")
+            .empty()
+            .append(modal_body_template(obj))
+            .modal({ show: true });
 
-        $(".select2").select2({
-
-        });
-
+          $(".select2").select2({});
+        }
       };
     },
     error: function (error) {
@@ -173,21 +182,8 @@
     },
   });
 
-  function editHit(pk, rol){
+  function editHit(pk, rol) {
     url = `/hits/api/v1/hits/${pk}/`;
-
-    // if(rol=="Big Boss"){
-    //   data = {
-    //     hitmen: $("#hitmen").val(),
-    //     status: $("input[name='customRadio']:checked").val(),
-    //   }
-    // }else{
-    //   data = {
-    //     hitmen: $("#hitmen").val(),
-    //     status: $("input[name='customRadio']:checked").val(),
-    //   }
-    // }
-
 
     $.ajax({
       url: url,
@@ -197,18 +193,27 @@
         hitmen: $("#hitmen").val(),
         status: $("input[name='customRadio']:checked").val(),
       },
-      headers: {Authorization: "jwt " + HDD.get(Django.name_jwt)},
-      success: function(response){
-        swal("..:: ::..");
-        setTimeout(function(){
-          location.reload();
-        }, 5000)
+      headers: { Authorization: "jwt " + HDD.get(Django.name_jwt) },
+      success: function (response) {
+        $.when(
+          $("#modalGeneral").modal("toggle"),
+          swal({
+            icon: "success",
+            title: "Éxito",
+            text: "Ha editado satisfactoriamente el Hit.",
+            timer: 5000,
+            buttons: false,
+          })
+        ).then(() => {
+          setTimeout(function () {
+            location.reload();
+          }, 50);
+        });
       },
-      error: function(error){
-        console.log(error.responseJSON)
-      }
-    })
-
+      error: function (error) {
+        console.log(error);
+      },
+    });
   }
 </script>
 

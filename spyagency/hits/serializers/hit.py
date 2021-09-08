@@ -18,6 +18,7 @@ class HitListSerializer(sz.Serializer):
     assigned_by = sz.SerializerMethodField()
     assigned_at = sz.SerializerMethodField()
     buttons = sz.SerializerMethodField()
+    buttons_bulk = sz.SerializerMethodField()
     modal = sz.SerializerMethodField()
     rol = sz.SerializerMethodField()
 
@@ -28,6 +29,7 @@ class HitListSerializer(sz.Serializer):
             name="customRadio"
             class="custom-control-input m-t-5"
             value="{value}"
+            {disabled}
           />
           <label
             class="custom-control-label text-{color} text-bold"
@@ -39,7 +41,7 @@ class HitListSerializer(sz.Serializer):
     select_template = """
     <div class="row form-group m-b-10">
         <label class="col-md-3 col-form-label">{label}</label>
-        <select name="{id}" id="{id}" class="form-control select2" style="width: 100%;">
+        <select name="{id}" id="{id}" {disabled} class="form-control select2" style="width: 100%;">
             <option disabled selected>{label}</option>
             {options}
         </select>
@@ -111,49 +113,70 @@ class HitListSerializer(sz.Serializer):
         url_detail = reverse("hits:views:detail", kwargs={"pk": instance.pk})
         return f"""<a href="{url_detail}"><i class="fa fa-eye"></i></a>"""
 
+    def get_buttons_bulk(self, instance):
+        pk = instance.pk
+        return f"""<a href="javascript:;" onclick="return loadModal({pk});"><i class="fa fa-edit"></i></a>"""
+
     def get_modal(self, instance):
         html = ""
-        data_select = {
-            "id": "hitmen",
-            "label": "Asesinos",
-            "options": self.my_team(instance)
-        }
-        html += self.select_template.format(**data_select)
-        data = {
+        status = instance.status
+        # radio button 1
+        radio = {
             "id": "bad",
-            "label": "Finalizar con éxito",
+            "label": "Finalizar sin éxito",
             "color": "danger",
-            "orientacion": "right",
-            "value": 3
+            "orientacion": "left",
+            "value": 3,
         }
-        html += self.radio_template.format(**data)
-        data["id"] = "good"
-        data["label"] = "Finalizar sin éxito"
-        data["color"] = "primary"
-        data["orientacion"] = "left"
-        data["value"] = 2
-        html += self.radio_template.format(**data)
+        # radio button 2
+        radio2 = {
+            "id": "good",
+            "label": "Finalizar con éxito",
+            "color": "primary",
+            "orientacion": "right",
+            "value": 2,
+        }
+
+        user = self.context["request"].user
+        if status in [2, 3]:
+            radio["disabled"] = "disabled"
+            radio2["disabled"] = "disabled"
+        elif status == 1:
+            radio["disabled"] = ""
+            radio2["disabled"] = ""
+
+        if user.get_rol_name in ["Big Boss", "Manager"]:
+            if status == 1:
+                data_select = {"id": "hitmen", "label": "Asesinos", "disabled": "", "options": self.my_team(instance)}
+            elif status in [2, 3]:
+                data_select = {
+                    "id": "hitmen",
+                    "label": "Asesinos",
+                    "disabled": "disabled",
+                    "options": "",
+                }
+
+            html += self.select_template.format(**data_select)
+            html += self.radio_template.format(**radio)
+            html += self.radio_template.format(**radio2)
+        else:
+            html += self.radio_template.format(**radio)
+            html += self.radio_template.format(**radio2)
         return html
 
     def my_team(self, instance):
         grupo = self.context["request"].user.get_team_name
-        users = User.objects.exclude(
-                pk=instance.hitmen.pk
-        )
+        users = User.objects.exclude(pk=instance.hitmen.pk)
         if grupo != "big_boss":
             pk = self.context["request"].user.pk
             grupo = "team-manager-{}".format(str(pk).zfill(3))
-            users = users.filter(
-                groups__name=grupo
-            ).exclude(
-                Q(groups__name="big_boss") |
-                Q(pk__in=[self.context["request"].user.pk, instance.hitmen.pk])
+            users = users.filter(groups__name=grupo).exclude(
+                Q(groups__name="big_boss") | Q(pk__in=[self.context["request"].user.pk, instance.hitmen.pk])
             )
         options = ""
         for user in users:
             options += self.option.format(key=user.email, value=user.pk)
         return options
-
 
 
 class HitCreateSerializer(sz.ModelSerializer):
@@ -173,6 +196,9 @@ class HitCreateSerializer(sz.ModelSerializer):
             "hit_detail",
             "assigned_by",
         )
+        extra_kwargs = {
+            "hitmen": {"required": False}
+        }
 
     def __init__(self, *args, **kwargs):
         fields = kwargs["context"].pop("fields_out", [])
@@ -187,6 +213,8 @@ class HitCreateSerializer(sz.ModelSerializer):
         return assigned_by
 
     def validate_hitmen(self, hitmen):
+        if not hitmen:
+            hitmen = self.instance.hitmen
         if hitmen.died:
             raise sz.ValidationError("El Asesino está fallecido.")
         if hitmen.retired:
@@ -233,3 +261,11 @@ class HitCreateSerializer(sz.ModelSerializer):
         hit.save()
         return hit
 
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        for key, value in validated_data.items():
+            if value in [None, ""]:
+                value = getattr(instance, key)
+            setattr(instance, key, value)
+        instance.save()
+        return super().update(instance, validated_data)

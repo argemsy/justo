@@ -10,15 +10,9 @@ from users.models import User
 from utils.decorator import decorator_api_titles
 
 
-@method_decorator(
-    decorator_api_titles(title="Hit's", subtitle="Listado general"), name="list"
-)
-@method_decorator(
-    decorator_api_titles(title="Hit", subtitle="Detalle"), name="retrieve"
-)
-@method_decorator(
-    decorator_api_titles(title="Re-Asignaciones", subtitle=""), name="bulk"
-)
+@method_decorator(decorator_api_titles(title="Hit's", subtitle="Listado general"), name="list")
+@method_decorator(decorator_api_titles(title="Hit", subtitle="Detalle"), name="retrieve")
+@method_decorator(decorator_api_titles(title="Re-Asignaciones", subtitle=""), name="bulk")
 class HitViewSet(ModelViewSet):
     serializer_class = HitCreateSerializer
 
@@ -31,9 +25,7 @@ class HitViewSet(ModelViewSet):
             queryset = Hit.objects.all()
         elif self.request.user.groups.filter(name="managers").exists():
             queryset = Hit.objects.filter(
-                Q(assigned_by=self.request.user) |
-                Q(hitmen=self.request.user) |
-                Q(assigned_by__in=self.get_big_boss())
+                Q(assigned_by=self.request.user) | Q(hitmen=self.request.user) | Q(assigned_by__in=self.get_big_boss())
             )
         else:
             queryset = Hit.objects.filter(hitmen=self.request.user)
@@ -60,13 +52,23 @@ class HitViewSet(ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         if self.action == "list":
-            context["fields_out"] = ['hit_detail', 'status_detail', 'assigned_at', 'modal']
+            context["fields_out"] = ["hit_detail", "status_detail", "assigned_at", "modal", "buttons_bulk"]
         elif self.action == "retrieve":
-            context["fields_out"] = ["id", "buttons", "status_detail", "level"]
-        elif self.action == 'update':
-            context["fields_out"] = ["first_name", "last_name"]
+            context["fields_out"] = ["id", "buttons", "status_detail", "level", "buttons_bulk"]
+        elif self.action == "bulk":
+            context["fields_out"] = ["hit_detail", "status_detail", "assigned_at", "modal", "buttons"]
+        elif self.action == "update":
+            if self.request.user.get_rol_name in ["Big Boss", "Manager"] and self.get_object().status == 1:
+                context["fields_out"] = ["first_name", "last_name"]
+            elif self.request.user.get_rol_name in ["Big Boss", "Manager"] and self.get_object().status in [2, 3]:
+                context["fields_out"] = ["first_name", "last_name", "hitmen"]
+            elif self.request.user.get_rol_name not in ["Big Boss", "Manager"] and self.get_object().status == 1:
+                context["fields_out"] = ["first_name", "last_name", "hitmen"]
         return context
 
     def perform_update(self, serializer):
-        serializer.save(status=self.request.POST.get("status", self.get_object().status))
+        instance_status = self.get_object().status
+        status = self.request.POST.get("status", instance_status)
+        extra_data = {"status": status}
+        serializer.save(**extra_data)
         return super().perform_update(serializer)
