@@ -111,11 +111,22 @@ class HitListSerializer(sz.Serializer):
 
     def get_buttons(self, instance):
         url_detail = reverse("hits:views:detail", kwargs={"pk": instance.pk})
-        return f"""<a href="{url_detail}"><i class="fa fa-eye"></i></a>"""
+        return f"""<a href="{url_detail}" class="btn btn-xs btn-inverse"><i class="fa fa-eye"></i></a>"""
 
     def get_buttons_bulk(self, instance):
-        pk = instance.pk
-        return f"""<a href="javascript:;" onclick="return loadModal({pk});"><i class="fa fa-edit"></i></a>"""
+        url_detail = reverse("hits:views:detail", kwargs={"pk": instance.pk})
+        data = {
+            "pk": instance.pk,
+            "options": "",
+            "status": instance.status
+        }
+
+        btn_edit = f"""<a href="javascript:;" class="btn btn-xs btn-warning" onclick="return loadModal({data});"><i class="fa fa-edit"></i></a>&nbsp;""" 
+        btn_detail = f"""<a href="{url_detail}" class="btn btn-xs btn-inverse"><i class="fa fa-eye"></i></a>&nbsp;"""
+
+        btns = btn_detail + btn_edit
+
+        return btns
 
     def get_modal(self, instance):
         html = ""

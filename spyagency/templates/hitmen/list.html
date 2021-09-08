@@ -92,36 +92,10 @@
 <script src="{% static 'plugins/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
 <script src="{% static 'js/demo/table-manage-responsive.demo.js' %}"></script>
 
-<script>
-  let dt = $("#users_dt").DataTable({
-    ajax: {
-      url: "/users/api/v1/",
-      headers: { Authorization: "jwt " + HDD.get(Django.name_jwt) },
-      dataSrc: function (response) {
-        return response.results;
-      },
-    },
-    initComplete: function (settings, response) {
-      console.log(response);
-      html = `${response.title}<small class="subtitle"> ${response.subtitle}</small>`;
-      $("#page-header").empty().html(html);
-    },
-    columns: [
-      { data: "id" },
-      { data: "username" },
-      { data: "email" },
-      { data: "team" },
-      { data: "rol" },
-      { data: "status" },
-      { data: "grupos" },
-    ],
-    responsive: true,
-    destroy: true,
-  });
-
-  // $(document).on('click', '[data-click="panel-lateral"]', function(e) {
-  // 	console.log(e)
-  // });
+<script type="text/javascript" id="insert_script_here">
+  var no_cache_random = Math.random().toString(36).substr(2, 5);
+  appendScript(
+    "{% static 'scripts/hitmen/list.js' %}?no_cache=" + no_cache_random
+  );
 </script>
-
 {% endblock extra_javascript %}

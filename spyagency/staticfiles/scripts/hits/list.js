@@ -1,4 +1,5 @@
 let dt = $("#hits_dt").DataTable({
+    language: dtLanguage("hit's"),
     ajax: {
         url: "/hits/api/v1/hits/",
         headers: { "Authorization": "jwt " + HDD.get(Django.name_jwt) },

@@ -48,6 +48,9 @@ class JWTMixin(AccessMixin):
                 del request.COOKIES[self.jwt]
                 response.delete_cookie(self.jwt)
             return response
+        elif not request.COOKIES[self.jwt]:
+            response = redirect(request)
+            return response
         return super().dispatch(request, *args, **kwargs)
 
 

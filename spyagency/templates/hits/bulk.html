@@ -7,6 +7,10 @@
   href="{% static 'plugins/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css' %}"
   rel="stylesheet"
 />
+<link
+  rel="stylesheet"
+  href="{% static 'plugins/select2/dist/css/select2.min.css' %}"
+/>
 {% endblock extra_stylesheet %} {% block container %}
 
 <!-- begin row -->
@@ -20,14 +24,6 @@
       <div class="panel-heading">
         <h4 class="panel-title"></h4>
         <div class="panel-heading-btn">
-          <a
-            href="javascript:;"
-            id="create_hits_button"
-            title="Nuevo Hit"
-            class="btn btn-xs btn-icon btn-primary hide"
-          >
-            <i class="fa fa-plus"></i>
-          </a>
           <a
             href="javascript:;"
             onclick="return updateDatatable();"
@@ -84,6 +80,8 @@
   </div>
   <!-- end col-12 -->
   <div></div>
+  <div class="modal" id="modalGeneral"></div>
+
 </div>
 <!-- end row -->
 {% endblock container %} {% block extra_javascript %}
@@ -92,43 +90,13 @@
 <script src="{% static 'plugins/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
 <script src="{% static 'plugins/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js' %}"></script>
 <script src="{% static 'js/demo/table-manage-responsive.demo.js' %}"></script>
+<script src="{% static 'plugins/select2/dist/js/select2.min.js' %}"></script>
 
-<script>
-  let dt = $("#hits_dt").DataTable({
-    ajax: {
-      url: "/hits/api/vi/hits/bulk/",
-      headers: { Authorization: "jwt " + HDD.get(Django.name_jwt) },
-      dataSrc: function (response) {
-        return response.results;
-      },
-    },
-    initComplete: function (settings, response) {
-
-      html = `${response.title}<small class="subtitle"> ${response.subtitle}</small>`;
-      $("#page-header").empty().html(html);
-
-      create_url = response.create_url;
-      if (create_url !== null) {
-        $("#create_hits_button").removeClass("hide").attr("href", create_url);
-      }
-    },
-    columns: [
-      { data: "id" },
-      { data: "code_hit" },
-      { data: "hitmen" },
-      { data: "target" },
-      { data: "status", "className": "text-center" },
-      { data: "level", "className": "text-center" },
-      { data: "assigned_by" },
-      { data: "buttons_bulk", "className": "text-center" },
-    ],
-    responsive: true,
-    destroy: true,
-  });
-
-  // $(document).on('click', '[data-click="panel-lateral"]', function(e) {
-  // 	console.log(e)
-  // });
+<script type="text/javascript" id="insert_script_here">
+  var no_cache_random = Math.random().toString(36).substr(2, 5);
+  appendScript(
+    "{% static 'scripts/hits/bulk.js' %}?no_cache=" + no_cache_random
+  );
 </script>
 
 {% endblock extra_javascript %}
